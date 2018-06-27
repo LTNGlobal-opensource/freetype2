@@ -20,7 +20,8 @@
 #include FT_INTERNAL_DEBUG_H
 #include FT_INTERNAL_STREAM_H
 #include FT_INTERNAL_OBJECTS_H
-
+#include FT_TRUETYPE_IDS_H
+#include FT_SERVICE_FONT_FORMAT_H
 
 #include "gf.h"
 #include "gfdrivr.h"
@@ -89,6 +90,7 @@
   gf_cmap_char_next(  FT_CMap     gfcmap,
                       FT_UInt32  *achar_code )
   {
+    GF_CMap    cmap   = (GF_CMap)gfcmap;
     FT_UInt    gindex = 0;
     FT_UInt32  result = 0;
     FT_UInt32  char_code = *achar_code + 1;
@@ -131,7 +133,7 @@
   GF_Face_Done( FT_Face        gfface )         /* GF_Face */
   {
     GF_Face    face = (GF_Face)gfface;
-    FT_Memory  memory;
+    FT_Memory  memory= FT_FACE_MEMORY( gfface );
 
 
     if ( !face )
@@ -139,7 +141,7 @@
 
     memory = FT_FACE_MEMORY( face );
 
-    gf_free_font( face->gf_glyph );
+    gf_free_font( face->gf_glyph, memory );
   }
 
 
@@ -171,7 +173,7 @@
 
     gfface->num_faces       = 1;
     gfface->face_index      = 0;
-    gfface->face_flags |    = FT_FACE_FLAG_FIXED_SIZES | FT_FACE_FLAG_HORIZONTAL ;
+    gfface->face_flags     |= FT_FACE_FLAG_FIXED_SIZES | FT_FACE_FLAG_HORIZONTAL ;
     gfface->family_name     = NULL;
     gfface->num_glyphs      = (FT_Long)(go->code_max - go->code_min + 1 );
     gfface->num_fixed_sizes = 1;
@@ -204,7 +206,7 @@
         /* initial platform/encoding should indicate unset status? */
         charmap.platform_id = TT_PLATFORM_APPLE_UNICODE;  /*Preliminary */
         charmap.encoding_id = TT_APPLE_ID_DEFAULT;
-        charmap.face        = root;
+        charmap.face        = face;
 
         error = FT_CMap_New( &gf_cmap_class, NULL, &charmap, NULL );
 
@@ -286,7 +288,7 @@
     FT_Face      face   = FT_FACE( gf );
     FT_Error     error  = FT_Err_Ok;
     FT_Bitmap*   bitmap = &slot->bitmap;
-    GF_BitmapRec glyph ;
+    GF_BitmapRec bm ;
 
     FT_UNUSED( load_flags );
 
@@ -316,7 +318,7 @@
       glyph_index = 0;
 
     /* slot, bitmap => freetype, glyph => gflib */
-    glyph = gf->gf_glyph->bm_table[glyph_index];
+    bm = gf->gf_glyph->bm_table[glyph_index];
 
     bitmap->rows  = bm.mv_y ; /* Prelimiary */
     bitmap->width = bm.mv_x ; /* Prelimiary */

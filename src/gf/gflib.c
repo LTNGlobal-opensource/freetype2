@@ -122,27 +122,27 @@ unsigned char   bit_table[] = {
 
     switch (READ_UINT1( stream ))
     {
-      case GF_BOC:
-        FT_STREAM_SKIP( 4 );
-        FT_STREAM_SKIP( 4 );
-        min_m = READ_INT4( stream );
-        max_m = READ_INT4( stream );
-        min_n = READ_INT4( stream );
-        max_n = READ_INT4( stream );
-        break;
+    case GF_BOC:
+      FT_STREAM_SKIP( 4 );
+      FT_STREAM_SKIP( 4 );
+      min_m = READ_INT4( stream );
+      max_m = READ_INT4( stream );
+      min_n = READ_INT4( stream );
+      max_n = READ_INT4( stream );
+      break;
 
-      case GF_BOC1:
-        FT_STREAM_SKIP( 1 );
-        del_m = (INT4)READ_UINT1( stream );
-        max_m = (INT4)READ_UINT1( stream );
-        del_n = (INT4)READ_UINT1( stream );
-        max_n = (INT4)READ_UINT1( stream );
-        min_m = max_m - del_m;
-        min_n = max_n - del_n;
-        break;
+    case GF_BOC1:
+      FT_STREAM_SKIP( 1 );
+      del_m = (INT4)READ_UINT1( stream );
+      max_m = (INT4)READ_UINT1( stream );
+      del_n = (INT4)READ_UINT1( stream );
+      max_n = (INT4)READ_UINT1( stream );
+      min_m = max_m - del_m;
+      min_n = max_n - del_n;
+      break;
 
-      default:
-        goto Fail;
+    default:
+      goto Fail;
     }
 
     w = max_m - min_m + 1;
@@ -194,11 +194,10 @@ unsigned char   bit_table[] = {
       {
         switch ((int)instr)
         {
-          case GF_PAINT1:
-          case GF_PAINT2:
-          case GF_PAINT3:
+        case GF_PAINT1:
+        case GF_PAINT2:
+        case GF_PAINT3:
           d = (UINT4)READ_UINTN( stream, (instr - GF_PAINT1 + 1));
-
           Paint:
             if (paint_sw == 0)
             {
@@ -223,36 +222,36 @@ unsigned char   bit_table[] = {
             paint_sw = 1 - paint_sw;
           break;
 
-					case GF_SKIP0:
+        case GF_SKIP0:
           m = min_m;
           n = n - 1;
           paint_sw = 0;
           break;
 
-          case GF_SKIP1:
-          case GF_SKIP2:
-          case GF_SKIP3:
+        case GF_SKIP1:
+        case GF_SKIP2:
+        case GF_SKIP3:
           m = min_m;
           n = n - (UINT4)READ_UINTN( stream, (instr - GF_SKIP1 + 1)) - 1;
           paint_sw = 0;
           break;
 
-          case GF_XXX1:
-          case GF_XXX2:
-          case GF_XXX3:
-          case GF_XXX4:
+        case GF_XXX1:
+        case GF_XXX2:
+        case GF_XXX3:
+        case GF_XXX4:
           k = READ_UINTN( stream, instr - GF_XXX1 + 1);
           FT_STREAM_SKIP( k );
           break;
 
-          case GF_YYY:
+        case GF_YYY:
           FT_STREAM_SKIP( 4 );
           break;
 
-          case GF_NO_OP:
+        case GF_NO_OP:
           break;
 
-          default:
+        default:
           FT_FREE(bm->bitmap);
           bm->bitmap = NULL;
           error = FT_THROW( Invalid_File_Format );
